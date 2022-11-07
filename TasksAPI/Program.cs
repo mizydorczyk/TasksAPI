@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using TasksAPI;
 using TasksAPI.Entities;
+using TasksAPI.Middleware;
 using TasksAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -47,6 +49,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseAuthentication();
 
