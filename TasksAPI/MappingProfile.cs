@@ -8,7 +8,7 @@ namespace TasksAPI
     {
         public MappingProfile()
         {
-            CreateMap<RegisterDto, User>();            
+            CreateMap<RegisterDto, User>();
         }
     }
 }

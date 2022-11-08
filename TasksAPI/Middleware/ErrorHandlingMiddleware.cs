@@ -1,9 +1,17 @@
 ﻿using TasksAPI.Exceptions;
+using NLog;
+using Newtonsoft.Json;
 
 namespace TasksAPI.Middleware
 {
     public class ErrorHandlingMiddleware : IMiddleware
     {
+        private readonly ILogger<ErrorHandlingMiddleware> _logger;
+        public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger)
+        {
+            _logger = logger;
+        }
+
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             try
@@ -23,6 +31,7 @@ namespace TasksAPI.Middleware
             catch (Exception e)
             {
                 context.Response.StatusCode = 500;
+                _logger.LogError(e, e.Message);
                 await context.Response.WriteAsync("Something went wrong");
             }
         }

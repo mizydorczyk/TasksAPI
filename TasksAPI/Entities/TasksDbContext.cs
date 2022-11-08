@@ -9,6 +9,7 @@ namespace TasksAPI.Entities
 
         }
         public DbSet<User> Users { get; set; }
+        public DbSet<Jwt> Blacklist { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()

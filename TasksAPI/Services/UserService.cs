@@ -15,27 +15,44 @@ namespace TasksAPI.Services
     {
         void Register(RegisterDto dto);
         string GenerateJwt(LoginDto dto);
+        void Delete();
     }
     public class UserService : IUserService
     {
-        private readonly TasksDbContext _context;
+        private readonly TasksDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly AuthenticationSettings _authenticationSettings;
+        private readonly IUserContextService _userContextService;
 
         public UserService(TasksDbContext context, 
                            IMapper mapper,
                            IPasswordHasher<User> passwordHasher,
-                           AuthenticationSettings authenticationSettings)
+                           AuthenticationSettings authenticationSettings,
+                           IUserContextService userContextService)
         {
-            _context = context;
+            _dbContext = context;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
             _authenticationSettings = authenticationSettings;
+            _userContextService = userContextService;
         }
+
+        public void Delete()
+        {
+            var user = _dbContext.Users.FirstOrDefault(x => x.Id == _userContextService.GetUserId);
+            if (user == null)
+            {
+                throw new BadRequestException("User does not exist");
+            }
+            _dbContext.Remove(user);
+            // BlacklistJwt(token); to do
+            _dbContext.SaveChanges();
+        }
+
         public string GenerateJwt(LoginDto dto)
         {
-            var user = _context
+            var user = _dbContext
                 .Users
                 .FirstOrDefault(n => n.Email == dto.Email);
             if (user is null)
@@ -74,8 +91,8 @@ namespace TasksAPI.Services
             var user = _mapper.Map<User>(dto);
             var hashedPassword = _passwordHasher.HashPassword(user, dto.Password);
             user.PasswordHash = hashedPassword;
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            _dbContext.Users.Add(user);
+            _dbContext.SaveChanges();
         }
     }
 }

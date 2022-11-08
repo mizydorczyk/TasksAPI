@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TasksAPI.Models;
 using TasksAPI.Services;
 
@@ -25,6 +26,14 @@ namespace TasksAPI.Controllers
         {
             var token = _userService.GenerateJwt(dto);
             return Ok(token);
+        }
+
+        [HttpDelete("delete")]
+        [Authorize]
+        public ActionResult Delete()
+        {
+            _userService.Delete();
+            return NoContent();
         }
     }
 }

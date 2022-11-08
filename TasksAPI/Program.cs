@@ -1,23 +1,39 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NLog.Web;
 using System.Reflection;
 using System.Text;
 using TasksAPI;
 using TasksAPI.Entities;
 using TasksAPI.Middleware;
 using TasksAPI.Services;
+using FluentValidation.AspNetCore;
+using TasksAPI.Models;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+
+builder.Services.AddControllers().AddFluentValidation();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSwaggerGen();
+
+// validators
+builder.Services.AddScoped<IValidator<RegisterDto>, RegisterUserDtoValidator>();
+
+// logging
+builder.Host.UseNLog();
+
+// middleware
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
+// user service
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
 var authenticationSettings = new AuthenticationSettings();
 builder.Configuration.GetSection("Authentication").Bind(authenticationSettings);
 builder.Services.AddSingleton(authenticationSettings);
@@ -39,6 +55,7 @@ builder.Services.AddAuthentication(option =>
     };
 });
 
+// db context
 builder.Services.AddDbContext<TasksDbContext>
     (options => options.UseSqlServer(builder.Configuration.GetConnectionString("TasksDbConnection")));
 
@@ -58,10 +75,12 @@ app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "RestaurantAPI");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "TasksAPI");
 });
 
 app.UseRouting();
+
+app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
