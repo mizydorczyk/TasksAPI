@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.Extensions.Primitives;
+using System.Security.Claims;
 
 namespace TasksAPI.Services
 {

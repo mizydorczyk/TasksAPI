@@ -15,7 +15,7 @@ namespace TasksAPI.Services
     {
         void Register(RegisterDto dto);
         string GenerateJwt(LoginDto dto);
-        void Delete();
+        void Delete(string token);
     }
     public class UserService : IUserService
     {
@@ -37,8 +37,7 @@ namespace TasksAPI.Services
             _authenticationSettings = authenticationSettings;
             _userContextService = userContextService;
         }
-
-        public void Delete()
+        public void Delete(string token)
         {
             var user = _dbContext.Users.FirstOrDefault(x => x.Id == _userContextService.GetUserId);
             if (user == null)
@@ -46,7 +45,18 @@ namespace TasksAPI.Services
                 throw new BadRequestException("User does not exist");
             }
             _dbContext.Remove(user);
-            // BlacklistJwt(token); to do
+            BlacklistJwt(token);
+            _dbContext.SaveChanges();
+        }
+        private void BlacklistJwt(string token)
+        {
+            JwtSecurityToken jwtToken = new(token.Substring(token.IndexOf(" ")+1));
+            Jwt jwt = new()
+            {
+                Token = token.Substring(token.IndexOf(" ") + 1),
+                ExpDate = jwtToken.ValidTo
+        };
+            _dbContext.Blacklist.Add(jwt);
             _dbContext.SaveChanges();
         }
 

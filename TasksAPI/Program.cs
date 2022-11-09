@@ -10,7 +10,9 @@ using TasksAPI.Middleware;
 using TasksAPI.Services;
 using FluentValidation.AspNetCore;
 using TasksAPI.Models;
+using TasksAPI.Authorization;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,13 @@ builder.Services.AddSwaggerGen();
 
 // validators
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterUserDtoValidator>();
+
+// authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("JwtNotInBlacklist", policy => policy.AddRequirements(new JwtNotInBlacklist()));
+});
+builder.Services.AddScoped<IAuthorizationHandler, JwtNotInBlacklistHandler>();
 
 // logging
 builder.Host.UseNLog();

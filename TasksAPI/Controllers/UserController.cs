@@ -30,9 +30,9 @@ namespace TasksAPI.Controllers
 
         [HttpDelete("delete")]
         [Authorize]
-        public ActionResult Delete()
+        public ActionResult Delete([FromHeader]string Authorization)
         {
-            _userService.Delete();
+            _userService.Delete(Authorization);
             return NoContent();
         }
     }
