@@ -16,6 +16,7 @@ namespace TasksAPI.Services
         void Register(RegisterDto dto);
         string GenerateJwt(LoginDto dto);
         void Delete(string token);
+        void ChangePassword(ChangePasswordDto dto, string token);
     }
     public class UserService : IUserService
     {
@@ -102,6 +103,30 @@ namespace TasksAPI.Services
             var hashedPassword = _passwordHasher.HashPassword(user, dto.Password);
             user.PasswordHash = hashedPassword;
             _dbContext.Users.Add(user);
+            _dbContext.SaveChanges();
+        }
+
+        public void ChangePassword(ChangePasswordDto dto, string token)
+        {
+            var userId = _userContextService.GetUserId;
+            var user = _dbContext
+                .Users
+                .FirstOrDefault(x => x.Id == userId);
+            if (user is null)
+            {
+                throw new BadRequestException("Something went wrong");
+            }
+
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.OldPassword);
+            if (result == PasswordVerificationResult.Failed)
+            {
+                throw new ForbidException("Invalid old password");
+            }
+
+            var hashedPassword = _passwordHasher.HashPassword(user, dto.NewPassword);
+            user.PasswordHash = hashedPassword;
+
+            BlacklistJwt(token);
             _dbContext.SaveChanges();
         }
     }
