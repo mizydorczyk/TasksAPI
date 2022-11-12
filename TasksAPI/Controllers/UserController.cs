@@ -29,7 +29,7 @@ namespace TasksAPI.Controllers
         }
 
         [HttpDelete("delete")]
-        [Authorize(Policy = "JwtNotInBlacklist")]
+        [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
         public ActionResult Delete([FromHeader]string Authorization)
         {
             _userService.Delete(Authorization);
@@ -37,7 +37,7 @@ namespace TasksAPI.Controllers
         }
 
         [HttpPost("changePassword")]
-        [Authorize(Policy = "JwtNotInBlacklist")]
+        [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
         public ActionResult ChangePassword([FromHeader]string Authorization, [FromBody]ChangePasswordDto dto)
         {
             _userService.ChangePassword(dto, Authorization);

@@ -9,6 +9,8 @@ namespace TasksAPI
         public MappingProfile()
         {
             CreateMap<RegisterDto, User>();
+            CreateMap<CreateGroupDto, Group>();
+            CreateMap<Group, GroupDto>();
         }
     }
 }

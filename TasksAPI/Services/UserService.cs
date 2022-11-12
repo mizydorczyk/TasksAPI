@@ -43,7 +43,7 @@ namespace TasksAPI.Services
             var user = _dbContext.Users.FirstOrDefault(x => x.Id == _userContextService.GetUserId);
             if (user == null)
             {
-                throw new BadRequestException("User does not exist");
+                throw new NotFoundException("User does not exist");
             }
             _dbContext.Remove(user);
             BlacklistJwt(token);
@@ -114,7 +114,7 @@ namespace TasksAPI.Services
                 .FirstOrDefault(x => x.Id == userId);
             if (user is null)
             {
-                throw new BadRequestException("Something went wrong");
+                throw new NotFoundException("Something went wrong");
             }
 
             var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.OldPassword);

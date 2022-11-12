@@ -13,6 +13,7 @@ using TasksAPI.Models;
 using TasksAPI.Authorization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
+using TasksAPI.Models.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ builder.Services.AddSwaggerGen();
 
 // validators
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterUserDtoValidator>();
+builder.Services.AddScoped <IValidator<ChangePasswordDto>, ChangePasswordDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateGroupDto>, CreateGroupDtoValidator>();
 
 // authorization
 builder.Services.AddAuthorization(options =>
@@ -47,6 +50,10 @@ var authenticationSettings = new AuthenticationSettings();
 builder.Configuration.GetSection("Authentication").Bind(authenticationSettings);
 builder.Services.AddSingleton(authenticationSettings);
 
+// task and group services
+builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+
 builder.Services.AddAuthentication(option =>
 {
     option.DefaultAuthenticateScheme = "Bearer";
@@ -67,6 +74,7 @@ builder.Services.AddAuthentication(option =>
 // db context
 builder.Services.AddDbContext<TasksDbContext>
     (options => options.UseSqlServer(builder.Configuration.GetConnectionString("TasksDbConnection")));
+
 
 var app = builder.Build();
 

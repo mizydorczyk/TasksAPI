@@ -29,7 +29,7 @@ namespace TasksAPI.Authorization
             }
             return token;
         }
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, JwtNotInBlacklist requirement)
+        protected override System.Threading.Tasks.Task HandleRequirementAsync(AuthorizationHandlerContext context, JwtNotInBlacklist requirement)
         {
             var result = _dbContext.Blacklist.FirstOrDefault(x => x.Token == GetJwtToken());
             if (result == null)
@@ -41,7 +41,7 @@ namespace TasksAPI.Authorization
             {
                 context.Fail();
             }
-            return Task.CompletedTask;
+            return System.Threading.Tasks.Task.CompletedTask;
         }
     }
 }
