@@ -164,7 +164,6 @@ namespace TasksAPI.Services
             }
 
             var invitationCode = Crypto.EncryptString(groupId.ToString(), _authenticationSettings.InvitationCodeKey);
-            var test = Crypto.DecryptString(invitationCode, _authenticationSettings.InvitationCodeKey);
             return invitationCode;
         }        
     }
