@@ -24,11 +24,18 @@ namespace TasksAPI.Controllers
             return Created($"/api/group/{id}", null);
         }
 
-        [HttpPost("{groupId}")]
-        public ActionResult InviteUser([FromRoute]int groupId, [FromHeader]int userId)
+        [HttpPost("join")]
+        public ActionResult Join([FromHeader]string invitationCode)
         {
-            _groupService.Invite(groupId, userId);
+            _groupService.Join(invitationCode);
             return Ok();
+        }
+
+        [HttpGet("{groupId}/getInvitationCode")]
+        public ActionResult<string> GetInvitationCode([FromRoute]int groupId)
+        {
+            var result = _groupService.GetInvitationCode(groupId);
+            return Ok(result);
         }
 
         [HttpGet]

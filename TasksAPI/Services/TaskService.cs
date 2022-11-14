@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using System.Linq;
-using System.Linq.Expressions;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using TasksAPI.Entities;
 using TasksAPI.Exceptions;

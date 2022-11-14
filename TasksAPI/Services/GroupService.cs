@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using System.Linq;
-using System.Linq.Expressions;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using TasksAPI.Entities;
 using TasksAPI.Exceptions;
@@ -12,23 +9,27 @@ namespace TasksAPI.Services
     public interface IGroupService
     {
         int Create(CreateGroupDto dto);
-        void Invite(int groupId, int userId);
+        void Join(string invitationCode);
         List<GroupDto> Get();
         void Delete(int groupId);
+        string GetInvitationCode(int groupId);
     }
     public class GroupService : IGroupService
     {
         private readonly IMapper _mapper;
         private readonly IUserContextService _userContextService;
         private readonly TasksDbContext _dbContext;
+        private readonly AuthenticationSettings _authenticationSettings;
 
         public GroupService(IMapper mapper,
                             IUserContextService userContextService,
-                            TasksDbContext dbContext)
+                            TasksDbContext dbContext,
+                            AuthenticationSettings authenticationSettings)
         {
             _mapper = mapper;
             _userContextService = userContextService;
             _dbContext = dbContext;
+            _authenticationSettings = authenticationSettings;
         }
         private bool IsGroupOwner(int groupId)
         {
@@ -107,20 +108,28 @@ namespace TasksAPI.Services
             return groupsDtos;
         }
 
-        public void Invite(int groupId, int userId)
+        public void Join(string invitationCode)
         {
+            int groupId;
+            try
+            {
+                groupId = Convert.ToInt32
+                    (Crypto.DecryptString(invitationCode, _authenticationSettings.InvitationCodeKey));
+            }
+            catch
+            {
+                throw new BadRequestException("Group does not exist");
+            }
+
             var group = _dbContext
                 .Groups
                 .FirstOrDefault(x => x.Id == groupId);
-            if(group is null)
+            if (group is null)
             {
-                throw new NotFoundException("Group does not exist");
-            }
-            if (!IsGroupOwner(groupId))
-            {
-                throw new ForbidException("Insufficient permission");
+                throw new BadRequestException("Group does not exist");
             }
 
+            var userId = _userContextService.GetUserId;
             var user = _dbContext.Users.FirstOrDefault(x => x.Id == userId);
             if(user is null)
             {
@@ -140,5 +149,23 @@ namespace TasksAPI.Services
             user.Groups.Add(group);
             _dbContext.SaveChanges();
         }
+        public string GetInvitationCode(int groupId)
+        {
+            var group = _dbContext
+                .Groups
+                .FirstOrDefault(x => x.Id == groupId);
+            if (group is null)
+            {
+                throw new BadRequestException("Group does not exist");
+            }
+            if (!IsGroupOwner(groupId))
+            {
+                throw new ForbidException("Insufficient permission");
+            }
+
+            var invitationCode = Crypto.EncryptString(groupId.ToString(), _authenticationSettings.InvitationCodeKey);
+            var test = Crypto.DecryptString(invitationCode, _authenticationSettings.InvitationCodeKey);
+            return invitationCode;
+        }        
     }
 }

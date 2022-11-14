@@ -28,7 +28,7 @@ namespace TasksAPI.Controllers
             return Ok(token);
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete]
         [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
         public ActionResult Delete([FromHeader]string Authorization)
         {
@@ -36,7 +36,7 @@ namespace TasksAPI.Controllers
             return NoContent();
         }
 
-        [HttpPost("changePassword")]
+        [HttpPut]
         [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
         public ActionResult ChangePassword([FromHeader]string Authorization, [FromBody]ChangePasswordDto dto)
         {
