@@ -23,6 +23,11 @@ namespace TasksAPI.Middleware
                 context.Response.StatusCode = 403;
                 await context.Response.WriteAsync(forbidException.Message);
             }
+            catch (NotFoundException notFoundException)
+            {
+                context.Response.StatusCode = 404;
+                await context.Response.WriteAsync(notFoundException.Message);
+            }
             catch (BadRequestException badRequestException)
             {
                 context.Response.StatusCode = 400;

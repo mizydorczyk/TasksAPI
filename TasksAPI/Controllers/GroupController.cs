@@ -34,8 +34,15 @@ namespace TasksAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<GroupDto>> GetAll()
         {
-            var groupsDtos = _groupService.GetAll();
+            var groupsDtos = _groupService.Get();
             return Ok(groupsDtos);
+        }
+
+        [HttpDelete("{groupId}")]
+        public ActionResult Delete([FromRoute]int groupId)
+        {
+            _groupService.Delete(groupId);
+            return NoContent();
         }
     }
 }

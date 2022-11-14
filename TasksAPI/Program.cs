@@ -26,7 +26,7 @@ builder.Services.AddSwaggerGen();
 
 // validators
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterUserDtoValidator>();
-builder.Services.AddScoped <IValidator<ChangePasswordDto>, ChangePasswordDtoValidator>();
+builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateGroupDto>, CreateGroupDtoValidator>();
 
 // authorization
@@ -74,9 +74,14 @@ builder.Services.AddAuthentication(option =>
 // db context
 builder.Services.AddDbContext<TasksDbContext>
     (options => options.UseSqlServer(builder.Configuration.GetConnectionString("TasksDbConnection")));
-
+builder.Services.AddScoped<BlacklistDrainer>();
 
 var app = builder.Build();
+
+// blacklist drainer
+var scope = app.Services.CreateScope();
+var drainer = scope.ServiceProvider.GetRequiredService<BlacklistDrainer>();
+drainer.Clear();
 
 if (app.Environment.IsDevelopment())
 {

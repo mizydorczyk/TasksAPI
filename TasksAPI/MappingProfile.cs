@@ -11,6 +11,8 @@ namespace TasksAPI
             CreateMap<RegisterDto, User>();
             CreateMap<CreateGroupDto, Group>();
             CreateMap<Group, GroupDto>();
+            CreateMap<Entities.Task, TaskDto>();
+            CreateMap<CreateTaskDto, Entities.Task>();
         }
     }
 }

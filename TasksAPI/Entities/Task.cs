@@ -7,7 +7,7 @@
         public string Description { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? Deadline { get; set; }
-        public bool isCompleted { get; set; }
+        public bool IsCompleted { get; set; }
         public virtual Group Group { get; set; }
     }
 }
