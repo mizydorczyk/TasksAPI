@@ -7,7 +7,8 @@ namespace TasksAPI.Controllers
 {
     [Route("/api/group/{groupId}/task")]
     [ApiController]
-    [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
+    [Authorize]
+    [Authorize(Policy = "JwtNotInBlacklist")]
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
@@ -17,31 +18,38 @@ namespace TasksAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create([FromRoute]int groupId, [FromBody]CreateTaskDto dto)
+        public ActionResult Create([FromRoute] int groupId, [FromBody] CreateTaskDto dto)
         {
             var id = _taskService.Create(groupId, dto);
             return Created($"/api/group/{groupId}/task/{id}", null);
         }
 
         [HttpDelete("{taskId}")]
-        public ActionResult Delete([FromRoute]int groupId, [FromRoute]int taskId)
+        public ActionResult Delete([FromRoute] int groupId, [FromRoute] int taskId)
         {
             _taskService.Delete(groupId, taskId);
             return NoContent();
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<TaskDto>> GetAll([FromRoute]int groupId)
+        public ActionResult<IEnumerable<TaskDto>> GetAll([FromRoute] int groupId, [FromQuery] string isCompleted)
         {
-            var result = _taskService.Get(groupId);
+            var result = _taskService.Get(groupId, isCompleted);
             return Ok(result);
         }
 
         [HttpGet("{taskId}")]
-        public ActionResult<TaskDto> Get([FromRoute]int groupId, [FromRoute]int taskId)
+        public ActionResult<TaskDto> Get([FromRoute] int groupId, [FromRoute] int taskId)
         {
             var result = _taskService.GetById(groupId, taskId);
             return Ok(result);
+        }
+
+        [HttpPut("{taskId}")]
+        public ActionResult Update([FromRoute] int groupId, [FromRoute] int taskId, [FromBody] UpdateTaskDto dto)
+        {
+            _taskService.Update(groupId, taskId, dto);
+            return Ok();
         }
     }
 }

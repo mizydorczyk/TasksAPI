@@ -28,6 +28,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateGroupDto>, CreateGroupDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateTaskDto>, CreateTaskDtoValidator>();
 
 // authorization
 builder.Services.AddAuthorization(options =>

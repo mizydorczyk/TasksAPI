@@ -10,8 +10,9 @@ namespace TasksAPI.Services
     {
         int Create(int groupId, CreateTaskDto dto);
         void Delete(int groupId, int taskId);
-        List<TaskDto>Get(int groupId);
+        List<TaskDto>Get(int groupId, string filter);
         TaskDto GetById(int groupId, int taskId);
+        void Update(int groupId, int taskId, UpdateTaskDto dto);
     }
     public class TaskService : ITaskService
     {
@@ -94,7 +95,7 @@ namespace TasksAPI.Services
             _dbContext.SaveChanges();
         }
 
-        public List<TaskDto> Get(int groupId)
+        public List<TaskDto> Get(int groupId, string filter)
         {
             var group = _dbContext
                 .Groups
@@ -109,8 +110,8 @@ namespace TasksAPI.Services
                 throw new ForbidException("Insufficient permission");
             }
 
-            var tasks = group.Tasks;
-            if (tasks is null || tasks.Count == 0)
+            var tasks = group.Tasks.Where(x => filter is null || x.IsCompleted.ToString().ToLower() == filter.ToLower());
+            if (tasks is null || tasks.Count() == 0)
             {
                 throw new NotFoundException("No tasks found");
             }
@@ -142,6 +143,50 @@ namespace TasksAPI.Services
 
             var taskDto = _mapper.Map<TaskDto>(task);
             return taskDto;
+        }
+
+        public void Update(int groupId, int taskId, UpdateTaskDto dto)
+        {
+            var group = _dbContext
+                .Groups
+                .Include(x => x.Tasks)
+                .FirstOrDefault(x => x.Id == groupId);
+            if (group is null)
+            {
+                throw new NotFoundException("Group not found");
+            }
+            if (!BelongsToGroup(groupId))
+            {
+                throw new ForbidException("Insufficient permission");
+            }
+
+            var task = group
+                .Tasks
+                .FirstOrDefault(x => x.Id == taskId);
+            if (task is null)
+            {
+                throw new NotFoundException("Task not found");
+            }
+
+            if(dto.Title is not null)
+            {
+                task.Title = dto.Title;
+            }
+            if(dto.Description is not null)
+            {
+                task.Description = dto.Description;
+            }
+            if(dto.Deadline is not null)
+            {
+                task.Deadline = dto.Deadline;
+            }
+            if(dto.IsCompleted is not null)
+            {
+                task.IsCompleted = (bool)dto.IsCompleted;
+            }
+
+            _dbContext.Update(task);
+            _dbContext.SaveChanges();
         }
     }
 }
