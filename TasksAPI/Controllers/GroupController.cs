@@ -24,7 +24,7 @@ namespace TasksAPI.Controllers
             return Created($"/api/group/{id}", null);
         }
 
-        [HttpPost("join ")]
+        [HttpPost("join")]
         public ActionResult Join([FromHeader]string invitationCode)
         {
             _groupService.Join(invitationCode);
