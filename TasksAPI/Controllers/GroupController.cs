@@ -18,37 +18,37 @@ namespace TasksAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<string> CreateGroup([FromBody] CreateGroupDto dto)
+        public async Task<ActionResult<string>> CreateGroup([FromBody] CreateGroupDto dto)
         {
-            var id = _groupService.Create(dto);
+            var id = await _groupService.Create(dto);
             return Created($"/api/group/{id}", null);
         }
 
         [HttpPost("join")]
-        public ActionResult Join([FromHeader]string invitationCode)
+        public async Task<ActionResult> Join([FromHeader]string invitationCode)
         {
-            _groupService.Join(invitationCode);
+            await _groupService.Join(invitationCode);
             return Ok();
         }
 
         [HttpGet("{groupId}/getInvitationCode")]
-        public ActionResult<string> GetInvitationCode([FromRoute]int groupId)
+        public async Task<ActionResult<string>> GetInvitationCode([FromRoute]int groupId)
         {
-            var result = _groupService.GetInvitationCode(groupId);
+            var result = await _groupService.GetInvitationCode(groupId);
             return Ok(result);
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<GroupDto>> GetAll()
+        public async Task<ActionResult<IEnumerable<GroupDto>>> GetAll()
         {
-            var groupsDtos = _groupService.Get();
+            var groupsDtos = await _groupService.Get();
             return Ok(groupsDtos);
         }
 
         [HttpDelete("{groupId}")]
-        public ActionResult Delete([FromRoute]int groupId)
+        public async Task<ActionResult> Delete([FromRoute]int groupId)
         {
-            _groupService.Delete(groupId);
+            await _groupService.Delete(groupId);
             return NoContent();
         }
     }

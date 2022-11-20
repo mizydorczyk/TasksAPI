@@ -13,10 +13,10 @@ namespace TasksAPI.Services
 {
     public interface IUserService
     {
-        void Register(RegisterDto dto);
-        string GenerateJwt(LoginDto dto);
-        void Delete(string token);
-        void ChangePassword(ChangePasswordDto dto, string token);
+        System.Threading.Tasks.Task Register(RegisterDto dto);
+        Task<string> GenerateJwt(LoginDto dto);
+        System.Threading.Tasks.Task Delete(string token);
+        System.Threading.Tasks.Task ChangePassword(ChangePasswordDto dto, string token);
     }
     public class UserService : IUserService
     {
@@ -38,18 +38,20 @@ namespace TasksAPI.Services
             _authenticationSettings = authenticationSettings;
             _userContextService = userContextService;
         }
-        public void Delete(string token)
+        public async System.Threading.Tasks.Task Delete(string token)
         {
-            var user = _dbContext.Users.FirstOrDefault(x => x.Id == _userContextService.GetUserId);
+            var user = await _dbContext
+                .Users
+                .FirstOrDefaultAsync(x => x.Id == _userContextService.GetUserId);
             if (user == null)
             {
                 throw new NotFoundException("User does not exist");
             }
             _dbContext.Remove(user);
-            BlacklistJwt(token);
-            _dbContext.SaveChanges();
+            await BlacklistJwt(token);
+            await _dbContext.SaveChangesAsync();
         }
-        private void BlacklistJwt(string token)
+        private async System.Threading.Tasks.Task BlacklistJwt(string token)
         {
             JwtSecurityToken jwtToken = new(token.Substring(token.IndexOf(" ")+1));
             Jwt jwt = new()
@@ -58,14 +60,14 @@ namespace TasksAPI.Services
                 ExpDate = jwtToken.ValidTo
         };
             _dbContext.Blacklist.Add(jwt);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public string GenerateJwt(LoginDto dto)
+        public async Task<string> GenerateJwt(LoginDto dto)
         {
-            var user = _dbContext
+            var user = await _dbContext
                 .Users
-                .FirstOrDefault(n => n.Email == dto.Email);
+                .FirstOrDefaultAsync(n => n.Email == dto.Email);
             if (user is null)
             {
                 throw new ForbidException("Invalid username or password");
@@ -97,21 +99,21 @@ namespace TasksAPI.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public void Register(RegisterDto dto)
+        public async System.Threading.Tasks.Task Register(RegisterDto dto)
         {
             var user = _mapper.Map<User>(dto);
             var hashedPassword = _passwordHasher.HashPassword(user, dto.Password);
             user.PasswordHash = hashedPassword;
             _dbContext.Users.Add(user);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void ChangePassword(ChangePasswordDto dto, string token)
+        public async System.Threading.Tasks.Task ChangePassword(ChangePasswordDto dto, string token)
         {
             var userId = _userContextService.GetUserId;
-            var user = _dbContext
+            var user = await _dbContext
                 .Users
-                .FirstOrDefault(x => x.Id == userId);
+                .FirstOrDefaultAsync(x => x.Id == userId);
             if (user is null)
             {
                 throw new NotFoundException("Something went wrong");
@@ -126,8 +128,8 @@ namespace TasksAPI.Services
             var hashedPassword = _passwordHasher.HashPassword(user, dto.NewPassword);
             user.PasswordHash = hashedPassword;
 
-            BlacklistJwt(token);
-            _dbContext.SaveChanges();
+            await BlacklistJwt(token);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

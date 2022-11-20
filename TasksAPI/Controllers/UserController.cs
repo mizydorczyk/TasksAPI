@@ -15,32 +15,32 @@ namespace TasksAPI.Controllers
             _userService = userService;
         }
         [HttpPost("register")]
-        public ActionResult Register([FromBody]RegisterDto dto)
+        public async Task<ActionResult> Register([FromBody]RegisterDto dto)
         {
-            _userService.Register(dto);
+            await _userService.Register(dto);
             return Ok();
         }
 
         [HttpPost("login")]
-        public ActionResult Login([FromBody]LoginDto dto)
+        public async Task<ActionResult> Login([FromBody]LoginDto dto)
         {
-            var token = _userService.GenerateJwt(dto);
+            var token = await _userService.GenerateJwt(dto);
             return Ok(token);
         }
 
         [HttpDelete]
         [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
-        public ActionResult Delete([FromHeader]string Authorization)
+        public async Task<ActionResult> Delete([FromHeader]string Authorization)
         {
-            _userService.Delete(Authorization);
+            await _userService.Delete(Authorization);
             return NoContent();
         }
 
         [HttpPut]
         [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
-        public ActionResult ChangePassword([FromHeader]string Authorization, [FromBody]ChangePasswordDto dto)
+        public async Task<ActionResult> ChangePassword([FromHeader]string Authorization, [FromBody]ChangePasswordDto dto)
         {
-            _userService.ChangePassword(dto, Authorization);
+            await _userService.ChangePassword(dto, Authorization);
             return Ok();
         }
     }

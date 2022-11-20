@@ -18,37 +18,37 @@ namespace TasksAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create([FromRoute] int groupId, [FromBody] CreateTaskDto dto)
+        public async Task<ActionResult> Create([FromRoute] int groupId, [FromBody] CreateTaskDto dto)
         {
-            var id = _taskService.Create(groupId, dto);
+            var id = await _taskService.Create(groupId, dto);
             return Created($"/api/group/{groupId}/task/{id}", null);
         }
 
         [HttpDelete("{taskId}")]
-        public ActionResult Delete([FromRoute] int groupId, [FromRoute] int taskId)
+        public async Task<ActionResult> Delete([FromRoute] int groupId, [FromRoute] int taskId)
         {
-            _taskService.Delete(groupId, taskId);
+            await _taskService.Delete(groupId, taskId);
             return NoContent();
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<TaskDto>> GetAll([FromRoute] int groupId, [FromQuery] string isCompleted)
+        public async Task<ActionResult<IEnumerable<TaskDto>>> GetAll([FromRoute] int groupId, [FromQuery] string isCompleted)
         {
-            var result = _taskService.Get(groupId, isCompleted);
+            var result = await _taskService.Get(groupId, isCompleted);
             return Ok(result);
         }
 
         [HttpGet("{taskId}")]
-        public ActionResult<TaskDto> Get([FromRoute] int groupId, [FromRoute] int taskId)
+        public async Task<ActionResult<TaskDto>> Get([FromRoute] int groupId, [FromRoute] int taskId)
         {
-            var result = _taskService.GetById(groupId, taskId);
+            var result = await _taskService.GetById(groupId, taskId);
             return Ok(result);
         }
 
         [HttpPut("{taskId}")]
-        public ActionResult Update([FromRoute] int groupId, [FromRoute] int taskId, [FromBody] UpdateTaskDto dto)
+        public async Task<ActionResult> Update([FromRoute] int groupId, [FromRoute] int taskId, [FromBody] UpdateTaskDto dto)
         {
-            _taskService.Update(groupId, taskId, dto);
+            await _taskService.Update(groupId, taskId, dto);
             return Ok();
         }
     }
