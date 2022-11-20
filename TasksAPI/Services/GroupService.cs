@@ -8,11 +8,11 @@ namespace TasksAPI.Services
 {
     public interface IGroupService
     {
-        int Create(CreateGroupDto dto);
-        void Join(string invitationCode);
-        List<GroupDto> Get();
-        void Delete(int groupId);
-        string GetInvitationCode(int groupId);
+        Task<int> Create(CreateGroupDto dto);
+        System.Threading.Tasks.Task Join(string invitationCode);
+        Task<List<GroupDto>> Get();
+        System.Threading.Tasks.Task Delete(int groupId);
+        Task<string> GetInvitationCode(int groupId);
     }
     public class GroupService : IGroupService
     {
@@ -31,26 +31,26 @@ namespace TasksAPI.Services
             _dbContext = dbContext;
             _authenticationSettings = authenticationSettings;
         }
-        private bool IsGroupOwner(int groupId)
+        private async Task<bool> IsGroupOwner(int groupId)
         {
             var userId = _userContextService.GetUserId;
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             if(group.CreatedById == userId)
             {
                 return true;
             }
             return false;
         }
-        public int Create(CreateGroupDto dto)
+        public async Task<int> Create(CreateGroupDto dto)
         {
             var group = _mapper.Map<Group>(dto);
             group.CreatedById = (int)_userContextService.GetUserId;
 
-            var user = _dbContext
+            var user = await _dbContext
                 .Users
-                .FirstOrDefault(x => x.Id == _userContextService.GetUserId);
+                .FirstOrDefaultAsync(x => x.Id == _userContextService.GetUserId);
             if (user is null)
             {
                 throw new BadRequestException("Something went wrong");
@@ -68,36 +68,36 @@ namespace TasksAPI.Services
             user.Groups.Add(group);
 
             _dbContext.Groups.Add(group);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return group.Id;
         }
 
-        public void Delete(int groupId)
+        public async System.Threading.Tasks.Task Delete(int groupId)
         {
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             if (group is null)
             {
                 throw new BadRequestException("Group does not exist");
             }
-            if (!IsGroupOwner(groupId))
+            if (!await IsGroupOwner(groupId))
             {
                 throw new ForbidException("Insufficient permission");
             }
 
             _dbContext.Groups.Remove(group);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public List<GroupDto> Get() 
+        public async Task<List<GroupDto>> Get() 
         {
             var userId = _userContextService.GetUserId;
-            var user = _dbContext
+            var user = await _dbContext
                 .Users
                 .Include(x => x.Groups)
                 .ThenInclude(x => x.Tasks)
-                .FirstOrDefault(x => x.Id == userId);
+                .FirstOrDefaultAsync(x => x.Id == userId);
             if (user is null)
             {
                 throw new BadRequestException("Something went wrong");
@@ -108,7 +108,7 @@ namespace TasksAPI.Services
             return groupsDtos;
         }
 
-        public void Join(string invitationCode)
+        public async System.Threading.Tasks.Task Join(string invitationCode)
         {
             int groupId;
             try
@@ -121,16 +121,18 @@ namespace TasksAPI.Services
                 throw new BadRequestException("Group does not exist");
             }
 
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             if (group is null)
             {
                 throw new BadRequestException("Group does not exist");
             }
 
             var userId = _userContextService.GetUserId;
-            var user = _dbContext.Users.FirstOrDefault(x => x.Id == userId);
+            var user = await _dbContext
+                .Users
+                .FirstOrDefaultAsync(x => x.Id == userId);
             if(user is null)
             {
                 throw new NotFoundException("User does not exist");
@@ -147,18 +149,18 @@ namespace TasksAPI.Services
 
             group.Users.Add(user);
             user.Groups.Add(group);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
-        public string GetInvitationCode(int groupId)
+        public async Task<string> GetInvitationCode(int groupId)
         {
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             if (group is null)
             {
                 throw new BadRequestException("Group does not exist");
             }
-            if (!IsGroupOwner(groupId))
+            if (!await IsGroupOwner(groupId))
             {
                 throw new ForbidException("Insufficient permission");
             }

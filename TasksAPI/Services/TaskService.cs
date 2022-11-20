@@ -8,11 +8,11 @@ namespace TasksAPI.Services
 {
     public interface ITaskService
     {
-        int Create(int groupId, CreateTaskDto dto);
-        void Delete(int groupId, int taskId);
-        List<TaskDto>Get(int groupId, string filter);
-        TaskDto GetById(int groupId, int taskId);
-        void Update(int groupId, int taskId, UpdateTaskDto dto);
+        Task<int> Create(int groupId, CreateTaskDto dto);
+        System.Threading.Tasks.Task Delete(int groupId, int taskId);
+        Task<List<TaskDto>> Get(int groupId, string filter);
+        Task<TaskDto> GetById(int groupId, int taskId);
+        System.Threading.Tasks.Task Update(int groupId, int taskId, UpdateTaskDto dto);
     }
     public class TaskService : ITaskService
     {
@@ -28,13 +28,13 @@ namespace TasksAPI.Services
             _mapper = mapper;
             _userContextService = userContextService;
         }
-        public bool BelongsToGroup(int groupId)
+        public async Task<bool> BelongsToGroup(int groupId)
         {
             var userId = _userContextService.GetUserId;
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
                 .Include(x => x.Users)
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             var user = group.Users.FirstOrDefault(x => x.Id == userId);
             if(user is null)
             {
@@ -42,16 +42,16 @@ namespace TasksAPI.Services
             }
             return true;
         }
-        public int Create(int groupId, CreateTaskDto dto)
+        public async Task<int> Create(int groupId, CreateTaskDto dto)
         {
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             if(group is null)
             {
                 throw new NotFoundException("Group not found");
             }
-            if (!BelongsToGroup(groupId))
+            if (!await BelongsToGroup(groupId))
             {
                 throw new ForbidException("Insufficient permission");
             }
@@ -64,21 +64,21 @@ namespace TasksAPI.Services
             task.CreatedDate = DateTime.Now;
             task.IsCompleted = false;
             group.Tasks.Add(task);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return task.Id;
         }
 
-        public void Delete(int groupId, int taskId)
+        public async System.Threading.Tasks.Task Delete(int groupId, int taskId)
         {
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
                 .Include(x => x.Tasks)
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             if (group is null)
             {
                 throw new NotFoundException("Group not found");
             }
-            if (!BelongsToGroup(groupId))
+            if (!await BelongsToGroup(groupId))
             {
                 throw new ForbidException("Insufficient permission");
             }
@@ -92,20 +92,20 @@ namespace TasksAPI.Services
             }
 
             _dbContext.Tasks.Remove(task);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public List<TaskDto> Get(int groupId, string filter)
+        public async Task<List<TaskDto>> Get(int groupId, string filter)
         {
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
                 .Include(x => x.Tasks)
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             if (group is null)
             {
                 throw new NotFoundException("Group not found");
             }
-            if (!BelongsToGroup(groupId))
+            if (!await BelongsToGroup(groupId))
             {
                 throw new ForbidException("Insufficient permission");
             }
@@ -120,17 +120,17 @@ namespace TasksAPI.Services
             return tasksDtos;
         }
 
-        public TaskDto GetById(int groupId, int taskId)
+        public async Task<TaskDto> GetById(int groupId, int taskId)
         {
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
                 .Include(x => x.Tasks)
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             if (group is null)
             {
                 throw new NotFoundException("Group not found");
             }
-            if (!BelongsToGroup(groupId))
+            if (!await BelongsToGroup(groupId))
             {
                 throw new ForbidException("Insufficient permission");
             }
@@ -145,17 +145,17 @@ namespace TasksAPI.Services
             return taskDto;
         }
 
-        public void Update(int groupId, int taskId, UpdateTaskDto dto)
+        public async System.Threading.Tasks.Task Update(int groupId, int taskId, UpdateTaskDto dto)
         {
-            var group = _dbContext
+            var group = await _dbContext
                 .Groups
                 .Include(x => x.Tasks)
-                .FirstOrDefault(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.Id == groupId);
             if (group is null)
             {
                 throw new NotFoundException("Group not found");
             }
-            if (!BelongsToGroup(groupId))
+            if (!await BelongsToGroup(groupId))
             {
                 throw new ForbidException("Insufficient permission");
             }
@@ -186,7 +186,7 @@ namespace TasksAPI.Services
             }
 
             _dbContext.Update(task);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
