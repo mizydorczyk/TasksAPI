@@ -7,6 +7,6 @@
         public string LastName { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
-        public virtual List<Group>Groups { get; set; }
+        public virtual List<Group> Groups { get; set; } = new List<Group>();
     }
 }

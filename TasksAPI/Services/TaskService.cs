@@ -57,10 +57,6 @@ namespace TasksAPI.Services
             }
 
             var task = _mapper.Map<Entities.Task>(dto);
-            if(group.Tasks is null)
-            {
-                group.Tasks = new List<Entities.Task>();
-            }
             task.CreatedDate = DateTime.Now;
             task.IsCompleted = false;
             group.Tasks.Add(task);

@@ -56,14 +56,6 @@ namespace TasksAPI.Services
                 throw new BadRequestException("Something went wrong");
             }
 
-            if(group.Users is null)
-            {
-                group.Users = new List<User>();
-            }
-            if (user.Groups is null)
-            {
-                user.Groups = new List<Group>();
-            }
             group.Users.Add(user);
             user.Groups.Add(group);
 
@@ -136,15 +128,6 @@ namespace TasksAPI.Services
             if(user is null)
             {
                 throw new NotFoundException("User does not exist");
-            }
-
-            if (group.Users == null)
-            {
-                group.Users = new List<User>();
-            }
-            if (user.Groups == null)
-            {
-                user.Groups = new List<Group>();
             }
 
             group.Users.Add(user);
