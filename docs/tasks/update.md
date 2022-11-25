@@ -1,7 +1,7 @@
 # Update task
 Updates given task.
 **URL:** `/api/group/{groupId}/task/{taskId}`
-**Method:** `PUT`
+**Method:** `PATCH`
 **Required Headers:** `Authorization` with user's JWT
 **Example:**
 ```json

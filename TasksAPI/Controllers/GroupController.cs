@@ -38,6 +38,13 @@ namespace TasksAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPut("{groupId}/renewInvitationCode")]
+        public async Task<ActionResult<string>> RenewInvitationCode([FromRoute] int groupId)
+        {
+            await _groupService.RenewInvitationCode(groupId);
+            return Ok();
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GroupDto>>> GetAll()
         {

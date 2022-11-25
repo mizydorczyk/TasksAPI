@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 using TasksAPI.Entities;
 using TasksAPI.Exceptions;
 using TasksAPI.Models;
@@ -13,6 +15,7 @@ namespace TasksAPI.Services
         Task<List<GroupDto>> Get();
         System.Threading.Tasks.Task Delete(int groupId);
         Task<string> GetInvitationCode(int groupId);
+        System.Threading.Tasks.Task RenewInvitationCode(int groupId);
     }
     public class GroupService : IGroupService
     {
@@ -31,6 +34,30 @@ namespace TasksAPI.Services
             _dbContext = dbContext;
             _authenticationSettings = authenticationSettings;
         }
+        public async Task<string> GetUniqueInvitationCode(int range = 10)
+        {
+            var invitationCodes = await _dbContext
+                .Groups
+                .Select(x => x.InvitationCode)
+                .ToListAsync();
+
+            var chars = "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var isUnique = false;
+            string result;
+            do
+            {
+                var random = new Random();
+                result = new string(
+                    Enumerable.Repeat(chars, range)
+                                .Select(s => s[random.Next(s.Length)])
+                                .ToArray());
+                if (!invitationCodes.Contains(result))
+                {
+                    isUnique = true;
+                }
+            } while (!isUnique);
+            return result;
+        }
         private async Task<bool> IsGroupOwner(int groupId)
         {
             var userId = _userContextService.GetUserId;
@@ -47,6 +74,7 @@ namespace TasksAPI.Services
         {
             var group = _mapper.Map<Group>(dto);
             group.CreatedById = (int)_userContextService.GetUserId;
+            group.InvitationCode = await GetUniqueInvitationCode();
 
             var user = await _dbContext
                 .Users
@@ -102,23 +130,13 @@ namespace TasksAPI.Services
 
         public async System.Threading.Tasks.Task Join(string invitationCode)
         {
-            int groupId;
-            try
-            {
-                groupId = Convert.ToInt32
-                    (Crypto.DecryptString(invitationCode, _authenticationSettings.InvitationCodeKey));
-            }
-            catch
-            {
-                throw new BadRequestException("Group does not exist");
-            }
-
             var group = await _dbContext
                 .Groups
-                .FirstOrDefaultAsync(x => x.Id == groupId);
+                .FirstOrDefaultAsync(x => x.InvitationCode == invitationCode);
+
             if (group is null)
             {
-                throw new BadRequestException("Group does not exist");
+                throw new BadRequestException("Invitation code is invalid or has already expired");
             }
 
             var userId = _userContextService.GetUserId;
@@ -148,8 +166,26 @@ namespace TasksAPI.Services
                 throw new ForbidException("Insufficient permission");
             }
 
-            var invitationCode = Crypto.EncryptString(groupId.ToString(), _authenticationSettings.InvitationCodeKey);
+            var invitationCode = group.InvitationCode;
             return invitationCode;
-        }        
+        }
+
+        public async System.Threading.Tasks.Task RenewInvitationCode(int groupId)
+        {
+            var group = await _dbContext
+                .Groups
+                .FirstOrDefaultAsync(x => x.Id == groupId);
+            if (group is null)
+            {
+                throw new BadRequestException("Group does not exist");
+            }
+            if (!await IsGroupOwner(groupId))
+            {
+                throw new ForbidException("Insufficient permission");
+            }
+
+            group.InvitationCode = await GetUniqueInvitationCode();
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

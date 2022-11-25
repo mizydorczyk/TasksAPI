@@ -1,7 +1,7 @@
 # Change password
 Changes user's password.
 **URL:** `/api/user`
-**Method:** `PUT`
+**Method:** `PATCH`
 **Required Headers:** `Authorization` with user's JWT
 **Example:**
 ```json

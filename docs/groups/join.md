@@ -11,7 +11,7 @@ User providing valid invitation code is able to join a group.
 **Code:** `400 BAD REQUEST` 
 **Content:**
 ```
-Group does not exist
+Invitation code is invalid or has already expired
 ```
 **Code:** `401 ANAUTHORIZED` 
 **Code:** `403 FORBIDDEN` when trying to use blacklist (deleted user's) JWT 

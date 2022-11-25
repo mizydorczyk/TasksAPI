@@ -45,7 +45,7 @@ namespace TasksAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{taskId}")]
+        [HttpPatch("{taskId}")]
         public async Task<ActionResult> Update([FromRoute] int groupId, [FromRoute] int taskId, [FromBody] UpdateTaskDto dto)
         {
             await _taskService.Update(groupId, taskId, dto);

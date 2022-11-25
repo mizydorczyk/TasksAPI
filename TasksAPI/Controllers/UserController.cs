@@ -36,7 +36,7 @@ namespace TasksAPI.Controllers
             return NoContent();
         }
 
-        [HttpPut]
+        [HttpPatch]
         [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
         public async Task<ActionResult> ChangePassword([FromHeader]string Authorization, [FromBody]ChangePasswordDto dto)
         {
