@@ -1,8 +1,9 @@
 # Register
-Creates user in the database.
-**URL:** `/api/user/register`
-**Method:** `POST`
-**Example:**
+Creates user in the database.  
+URL: `/api/user/register`  
+Method: `POST`  
+
+## Example
 ```json
 {
     "firstName": "example",
@@ -12,12 +13,12 @@ Creates user in the database.
 }
 ```
 
-## Sucess Response
-**Code:** `201 CREATED`
+## Success response
+Code: `201 CREATED`  
 
 ## Error response
-**Code:** `400 BAD REQUEST`
-**Content:**
+Code: `400 BAD REQUEST`  
+Content:  
 ```json
 {
     "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",

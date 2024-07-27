@@ -1,9 +1,10 @@
 # Change password
-Changes user's password.
-**URL:** `/api/user`
-**Method:** `PATCH`
-**Required Headers:** `Authorization` with user's JWT
-**Example:**
+Changes user's password.  
+URL: `/api/user`  
+Method: `PATCH`  
+Required Headers: `Authorization` with user's JWT  
+
+## Example  
 ```json
 {
     "oldPassword": "example",
@@ -11,12 +12,12 @@ Changes user's password.
 }
 ```
 
-## Sucess Response
-**Code:** `200 OK`
+## Success response
+Code: `200 OK`
 
 ## Error response
-**Code:** `400 BAD REQUEST`
-**Content:**
+Code: `400 BAD REQUEST`  
+Content:  
 ```json
 {
     "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
@@ -31,5 +32,5 @@ Changes user's password.
     }
 }
 ```
-**Code:** `401 ANAUTHORIZED` 
-**Code:** `403 FORBIDDEN` when trying to use blacklist (deleted user's) JWT
+Code: `401 ANAUTHORIZED`  
+Code: `403 FORBIDDEN` when trying to use blacklist (deleted user's) JWT

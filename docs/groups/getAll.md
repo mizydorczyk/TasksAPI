@@ -1,11 +1,11 @@
 # Get all user's groups
-Returns all groups with tasks user belongs to from the database.
-**URL:** `/api/group/`
-**Method:** `GET`
+Returns all groups with tasks user belongs to from the database.  
+URL: `/api/group/`  
+Method: `GET`  
 
-## Sucess Response
-**Code:** `200 OK`
-```json
+## Success response
+Code: `200 OK`  
+```json  
 [
     {
         "id": 1,
@@ -30,5 +30,5 @@ Returns all groups with tasks user belongs to from the database.
 ```
 
 ## Error response
-**Code:** `401 ANAUTHORIZED` 
-**Code:** `403 FORBIDDEN` when trying to use blacklist (deleted user's) JWT
+Code: `401 ANAUTHORIZED`  
+Code: `403 FORBIDDEN` when trying to use blacklist (deleted user's) JWT  

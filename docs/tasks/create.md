@@ -1,20 +1,21 @@
 # Create task
-Creates task in the database.
-**URL:** `/api/group/{groupId}/task`
-**Method:** `POST`
-**Example:**
+Creates task in the database.  
+URL: `/api/group/{groupId}/task`  
+Method: `POST`  
+
+## Example
 ```json
 {
     "name": "example group"
 }
 ```
 
-## Sucess Response
-**Code:** `201 CREATED`
+## Success response
+Code: `201 CREATED`  
 
 ## Error response
-**Code:** `400 BAD REQUEST`
-**Content:**
+Code: `400 BAD REQUEST`  
+Content:  
 ```json
 {
     "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
@@ -28,14 +29,14 @@ Creates task in the database.
     }
 }
 ```
-**Code:** `404 NOT FOUND`
-**Content:**
+Code: `404 NOT FOUND`  
+Content:  
 ```
 Group not found
 ```
-**Code:** `403 FORBIDDEN`
+Code: `403 FORBIDDEN`  
 ```
 Insufficient permission
 ```
-**Code:** `401 ANAUTHORIZED` 
-**Code:** `403 FORBIDDEN` when trying to use blacklist (deleted user's) JWT
+Code: `401 ANAUTHORIZED`   
+Code: `403 FORBIDDEN` when trying to use blacklist (deleted user's) JWT  

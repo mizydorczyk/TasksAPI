@@ -1,20 +1,21 @@
 # Create group
-Creates group in the database.
-**URL:** `/api/group/`
-**Method:** `POST`
-**Example:**
+Creates group in the database.  
+URL: `/api/group/`  
+Method: `POST`  
+
+## Example  
 ```json
 {
     "name": "example group"
 }
 ```
 
-## Sucess Response
-**Code:** `201 CREATED`
+## Success response
+Code: `201 CREATED`  
 
 ## Error response
-**Code:** `400 BAD REQUEST`
-**Content:**
+Code: `400 BAD REQUEST`  
+Content:  
 ```json
 {
     "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
@@ -28,5 +29,5 @@ Creates group in the database.
     }
 }
 ```
-**Code:** `401 ANAUTHORIZED` 
-**Code:** `403 FORBIDDEN` when trying to use blacklist (deleted user's) JWT
+Code: `401 ANAUTHORIZED`  
+Code: `403 FORBIDDEN` when trying to use blacklist (deleted user's) JWT  
