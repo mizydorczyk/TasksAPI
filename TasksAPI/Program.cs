@@ -79,11 +79,6 @@ builder.Services.AddScoped<BlacklistDrainer>();
 
 var app = builder.Build();
 
-// blacklist drainer
-var scope = app.Services.CreateScope();
-var drainer = scope.ServiceProvider.GetRequiredService<BlacklistDrainer>();
-drainer.Clear();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -109,5 +104,24 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<TasksDbContext>();
+
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        await dbContext.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occured during migration");
+    }
+
+    var drainer = scope.ServiceProvider.GetRequiredService<BlacklistDrainer>();
+    drainer.Clear();
+}
 
 app.Run();
