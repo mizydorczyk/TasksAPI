@@ -1,0 +1,18 @@
+services:
+  backend:
+    image: tasks_api
+    build:
+      dockerfile: ./TasksAPI/Dockerfile
+    container_name: backend
+    ports:
+      - "5000:80"
+    depends_on:
+      - sql_server
+  sql_server:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server
+    ports:
+      - "1433:1433" 
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YOUR_PASSW0RD"
