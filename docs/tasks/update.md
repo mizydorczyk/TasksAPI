@@ -7,7 +7,10 @@ Required Headers: `Authorization` with user's JWT
 ## Example
 ```json
 {
-    "isCompleted": true
+  "title": null,
+  "description": null,
+  "deadline": "2024-09-25T18:00:24",
+  "isCompleted": null
 }
 ```
 

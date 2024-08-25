@@ -7,7 +7,7 @@ Method: `POST`
 ```json
 {
     "email": "exampleEmail@example.com",
-    "password": "examplePassword",
+    "password": "examplePassword"
 }
 ```
 

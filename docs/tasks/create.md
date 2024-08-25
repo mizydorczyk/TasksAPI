@@ -6,7 +6,9 @@ Method: `POST`
 ## Example
 ```json
 {
-    "name": "example group"
+    "title": "Write unit-test",
+    "description": "They are really necessary",
+    "deadline": null
 }
 ```
 
