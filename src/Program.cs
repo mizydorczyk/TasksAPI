@@ -14,11 +14,12 @@ using TasksAPI.Authorization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using TasksAPI.Models.Validators;
+using Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-builder.Services.AddControllers().AddFluentValidation();
+builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddHttpContextAccessor();
@@ -31,10 +32,7 @@ builder.Services.AddScoped<IValidator<CreateGroupDto>, CreateGroupDtoValidator>(
 builder.Services.AddScoped<IValidator<CreateTaskDto>, CreateTaskDtoValidator>();
 
 // authorization
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("JwtNotInBlacklist", policy => policy.AddRequirements(new JwtNotInBlacklist()));
-});
+builder.Services.AddAuthorization(options => { options.AddPolicy("JwtNotInBlacklist", policy => policy.AddRequirements(new JwtNotInBlacklist())); });
 builder.Services.AddScoped<IAuthorizationHandler, JwtNotInBlacklistHandler>();
 
 // logging
@@ -73,8 +71,7 @@ builder.Services.AddAuthentication(option =>
 });
 
 // db context
-builder.Services.AddDbContext<TasksDbContext>
-    (options => options.UseSqlServer(builder.Configuration.GetConnectionString("TasksDbConnection")));
+builder.Services.AddDbContext<TasksDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TasksDbConnection")));
 builder.Services.AddScoped<BlacklistDrainer>();
 
 var app = builder.Build();
@@ -82,28 +79,16 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "tasks-api"); });
 }
+
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseAuthentication();
-
 app.UseHttpsRedirection();
-
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "TasksAPI");
-});
-
 app.UseRouting();
-
 app.UseAuthorization();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {

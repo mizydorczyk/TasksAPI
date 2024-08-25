@@ -1,9 +1,8 @@
-﻿namespace TasksAPI.Entities
+﻿namespace TasksAPI.Entities;
+
+public class Jwt
 {
-    public class Jwt
-    {
-        public int Id { get; set; }
-        public string Token { get; set; }
-        public DateTime? ExpDate { get; set; }
-    }
+    public int Id { get; set; }
+    public string Token { get; set; }
+    public DateTime? ExpDate { get; set; }
 }

@@ -2,17 +2,16 @@
 using TasksAPI.Entities;
 using TasksAPI.Models;
 
-namespace TasksAPI
+namespace TasksAPI;
+
+public class MappingProfile : Profile
 {
-    public class MappingProfile : Profile
+    public MappingProfile()
     {
-        public MappingProfile()
-        {
-            CreateMap<RegisterDto, User>();
-            CreateMap<CreateGroupDto, Group>();
-            CreateMap<Group, GroupDto>();
-            CreateMap<Entities.Task, TaskDto>();
-            CreateMap<CreateTaskDto, Entities.Task>();
-        }
+        CreateMap<RegisterDto, User>();
+        CreateMap<CreateGroupDto, Group>();
+        CreateMap<Group, GroupDto>();
+        CreateMap<Entities.Task, TaskDto>();
+        CreateMap<CreateTaskDto, Entities.Task>();
     }
 }

@@ -1,47 +1,50 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Interfaces;
 using TasksAPI.Models;
-using TasksAPI.Services;
 
-namespace TasksAPI.Controllers
+namespace TasksAPI.Controllers;
+
+[Route("/api/user")]
+[ApiController]
+public class UserController : ControllerBase
 {
-    [Route("/api/user")]
-    [ApiController]
-    public class UserController : ControllerBase
+    private readonly IUserService _userService;
+
+    public UserController(IUserService userService)
     {
-        private readonly IUserService _userService;
-        public UserController(IUserService userService)
-        {
-            _userService = userService;
-        }
-        [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody]RegisterDto dto)
-        {
-            await _userService.Register(dto);
-            return Ok();
-        }
+        _userService = userService;
+    }
 
-        [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody]LoginDto dto)
-        {
-            var token = await _userService.GenerateJwt(dto);
-            return Ok(token);
-        }
+    [HttpPost("register")]
+    public async Task<ActionResult> Register([FromBody] RegisterDto dto)
+    {
+        await _userService.Register(dto);
+        return Ok();
+    }
 
-        [HttpDelete]
-        [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
-        public async Task<ActionResult> Delete([FromHeader]string Authorization)
-        {
-            await _userService.Delete(Authorization);
-            return NoContent();
-        }
+    [HttpPost("login")]
+    public async Task<ActionResult> Login([FromBody] LoginDto dto)
+    {
+        var token = await _userService.GenerateJwt(dto);
+        return Ok(token);
+    }
 
-        [HttpPatch]
-        [Authorize][Authorize(Policy = "JwtNotInBlacklist")]
-        public async Task<ActionResult> ChangePassword([FromHeader]string Authorization, [FromBody]ChangePasswordDto dto)
-        {
-            await _userService.ChangePassword(dto, Authorization);
-            return Ok();
-        }
+    [HttpDelete]
+    [Authorize]
+    [Authorize(Policy = "JwtNotInBlacklist")]
+    public async Task<ActionResult> Delete([FromHeader] string Authorization)
+    {
+        await _userService.Delete(Authorization);
+        return NoContent();
+    }
+
+    [HttpPatch]
+    [Authorize]
+    [Authorize(Policy = "JwtNotInBlacklist")]
+    public async Task<ActionResult> ChangePassword([FromHeader] string Authorization, [FromBody] ChangePasswordDto dto)
+    {
+        await _userService.ChangePassword(dto, Authorization);
+        return Ok();
     }
 }

@@ -11,8 +11,8 @@ using TasksAPI.Entities;
 namespace TasksAPI.Migrations
 {
     [DbContext(typeof(TasksDbContext))]
-    [Migration("20221107204911_init")]
-    partial class init
+    [Migration("20221107204911_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

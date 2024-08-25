@@ -3,45 +3,43 @@ using Microsoft.Extensions.Primitives;
 using TasksAPI.Entities;
 using System.Text;
 
-namespace TasksAPI.Authorization
-{
-    public class JwtNotInBlacklistHandler : AuthorizationHandler<JwtNotInBlacklist>
-    {
-        private readonly TasksDbContext _dbContext;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+namespace TasksAPI.Authorization;
 
-        public JwtNotInBlacklistHandler(TasksDbContext dbContext, IHttpContextAccessor httpContextAccessor)
-        {
-            _dbContext = dbContext;
-            _httpContextAccessor = httpContextAccessor;
-        }
-        private string GetJwtToken()
-        {
-            string token = "";
-            if (_httpContextAccessor
+public class JwtNotInBlacklistHandler : AuthorizationHandler<JwtNotInBlacklist>
+{
+    private readonly TasksDbContext _dbContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public JwtNotInBlacklistHandler(TasksDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+    {
+        _dbContext = dbContext;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    private string GetJwtToken()
+    {
+        var token = "";
+        if (_httpContextAccessor
                 .HttpContext
                 .Request
                 .Headers
-                .TryGetValue("Authorization", out StringValues s) && s.Any())
-            {
-                token = s.First();
-                token = token.Substring(token.IndexOf(" ") + 1);
-            }
-            return token;
-        }
-        protected override System.Threading.Tasks.Task HandleRequirementAsync(AuthorizationHandlerContext context, JwtNotInBlacklist requirement)
+                .TryGetValue("Authorization", out var s) && s.Any())
         {
-            var result = _dbContext.Blacklist.FirstOrDefault(x => x.Token == GetJwtToken());
-            if (result == null)
-            {
-                context.Succeed(requirement);
-
-            }
-            else
-            {
-                context.Fail();
-            }
-            return System.Threading.Tasks.Task.CompletedTask;
+            token = s.First();
+            token = token.Substring(token.IndexOf(" ") + 1);
         }
+
+        return token;
+    }
+
+    protected override System.Threading.Tasks.Task HandleRequirementAsync(AuthorizationHandlerContext context, JwtNotInBlacklist requirement)
+    {
+        var result = _dbContext.Blacklist.FirstOrDefault(x => x.Token == GetJwtToken());
+        if (result == null)
+            context.Succeed(requirement);
+        else
+            context.Fail();
+
+        return System.Threading.Tasks.Task.CompletedTask;
     }
 }

@@ -1,14 +1,13 @@
 ﻿using FluentValidation;
 
-namespace TasksAPI.Models.Validators
+namespace TasksAPI.Models.Validators;
+
+public class CreateGroupDtoValidator : AbstractValidator<CreateGroupDto>
 {
-    public class CreateGroupDtoValidator : AbstractValidator<CreateGroupDto>
+    public CreateGroupDtoValidator()
     {
-        public CreateGroupDtoValidator()
-        {
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithMessage("Group name must be specified");
-        }
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage("Group name must be specified");
     }
 }

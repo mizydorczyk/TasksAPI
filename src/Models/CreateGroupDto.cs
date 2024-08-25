@@ -1,7 +1,6 @@
-﻿namespace TasksAPI.Models
+﻿namespace TasksAPI.Models;
+
+public class CreateGroupDto
 {
-    public class CreateGroupDto
-    {
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }

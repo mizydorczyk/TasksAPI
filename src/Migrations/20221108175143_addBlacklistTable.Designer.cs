@@ -12,7 +12,7 @@ using TasksAPI.Entities;
 namespace TasksAPI.Migrations
 {
     [DbContext(typeof(TasksDbContext))]
-    [Migration("20221108175143_addBlacklistTable")]
+    [Migration("20221108175143_AddBlacklistTable")]
     partial class addBlacklistTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

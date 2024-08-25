@@ -1,25 +1,24 @@
 ﻿using TasksAPI.Entities;
 using TasksAPI.Exceptions;
 
-namespace TasksAPI
+namespace TasksAPI;
+
+public class BlacklistDrainer
 {
-    public class BlacklistDrainer
+    private readonly TasksDbContext _dbContext;
+
+    public BlacklistDrainer(TasksDbContext dbContext)
     {
-        private readonly TasksDbContext _dbContext;
-        public BlacklistDrainer(TasksDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-        public void Clear()
-        {
-            var blacklist = _dbContext.Blacklist;
-            if(blacklist is null)
-            {
-                throw new NotFoundException("Blacklist not found");
-            }
-            var expired = blacklist.Where(x => x.ExpDate < DateTime.Now).ToList();
-            _dbContext.Blacklist.RemoveRange(expired);
-            _dbContext.SaveChanges();
-        }
+        _dbContext = dbContext;
+    }
+
+    public void Clear()
+    {
+        var blacklist = _dbContext.Blacklist;
+        if (blacklist is null) throw new NotFoundException("Blacklist not found");
+
+        var expired = blacklist.Where(x => x.ExpDate < DateTime.Now).ToList();
+        _dbContext.Blacklist.RemoveRange(expired);
+        _dbContext.SaveChanges();
     }
 }

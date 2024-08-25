@@ -1,4 +1,4 @@
-# TasksAPI                            
+# tasks-api                            
 
 The app enables the registration and login of users, who can then create, mark as done, tasks within the created groups. Furthermore, the creator of a group as its owner can generate an invitation code and invite others to join their task group.
 

@@ -1,12 +1,11 @@
-﻿namespace TasksAPI.Models
+﻿namespace TasksAPI.Models;
+
+public class TaskDto
 {
-    public class TaskDto
-    {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime? Deadline { get; set; }
-        public bool IsCompleted { get; set; }
-    }
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime? Deadline { get; set; }
+    public bool IsCompleted { get; set; }
 }
