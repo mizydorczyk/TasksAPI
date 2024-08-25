@@ -16,17 +16,13 @@ public class JwtNotInBlacklistHandler : AuthorizationHandler<JwtNotInBlacklist>
         _httpContextAccessor = httpContextAccessor;
     }
 
-    private string GetJwtToken()
+    private static string GetJwtToken(HttpContext httpContext)
     {
         var token = "";
-        if (_httpContextAccessor
-                .HttpContext
-                .Request
-                .Headers
-                .TryGetValue("Authorization", out var s) && s.Any())
+        if (httpContext.Request.Headers.TryGetValue("Authorization", out var s) && s.Any())
         {
             token = s.First();
-            token = token.Substring(token.IndexOf(" ") + 1);
+            token = token.Substring(token.IndexOf(" ", StringComparison.Ordinal) + 1);
         }
 
         return token;
@@ -34,7 +30,11 @@ public class JwtNotInBlacklistHandler : AuthorizationHandler<JwtNotInBlacklist>
 
     protected override System.Threading.Tasks.Task HandleRequirementAsync(AuthorizationHandlerContext context, JwtNotInBlacklist requirement)
     {
-        var result = _dbContext.Blacklist.FirstOrDefault(x => x.Token == GetJwtToken());
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null)
+            context.Fail();
+
+        var result = _dbContext.Blacklist.FirstOrDefault(x => x.Token == GetJwtToken(httpContext));
         if (result == null)
             context.Succeed(requirement);
         else

@@ -46,12 +46,13 @@ public class UserService : IUserService
 
     private async System.Threading.Tasks.Task BlacklistJwt(string token)
     {
-        JwtSecurityToken jwtToken = new(token.Substring(token.IndexOf(" ") + 1));
+        JwtSecurityToken jwtToken = new(token.Substring(token.IndexOf(" ", StringComparison.Ordinal) + 1));
         Jwt jwt = new()
         {
-            Token = token.Substring(token.IndexOf(" ") + 1),
+            Token = token.Substring(token.IndexOf(" ", StringComparison.Ordinal) + 1),
             ExpDate = jwtToken.ValidTo
         };
+
         _dbContext.Blacklist.Add(jwt);
         await _dbContext.SaveChangesAsync();
     }
@@ -90,6 +91,7 @@ public class UserService : IUserService
         var user = _mapper.Map<User>(dto);
         var hashedPassword = _passwordHasher.HashPassword(user, dto.Password);
         user.PasswordHash = hashedPassword;
+
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
     }

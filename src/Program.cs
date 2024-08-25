@@ -53,6 +53,7 @@ builder.Services.AddSingleton(authenticationSettings);
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 
+// authentication
 builder.Services.AddAuthentication(option =>
 {
     option.DefaultAuthenticateScheme = "Bearer";
@@ -76,6 +77,7 @@ builder.Services.AddScoped<BlacklistDrainer>();
 
 var app = builder.Build();
 
+// swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -90,6 +92,7 @@ app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
 
+// migration
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

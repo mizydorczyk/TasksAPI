@@ -22,7 +22,7 @@ public class TaskService : ITaskService
         _userContextService = userContextService;
     }
 
-    public async Task<bool> BelongsToGroup(int groupId)
+    private async Task<bool> BelongsToGroup(int groupId)
     {
         var userId = _userContextService.GetUserId;
         var group = await _dbContext
@@ -31,9 +31,8 @@ public class TaskService : ITaskService
             .FirstOrDefaultAsync(x => x.Id == groupId);
 
         var user = group.Users.FirstOrDefault(x => x.Id == userId);
-        if (user is null) return false;
 
-        return true;
+        return user is not null;
     }
 
     public async Task<int> Create(int groupId, CreateTaskDto dto)
@@ -48,6 +47,7 @@ public class TaskService : ITaskService
         task.CreatedDate = DateTime.Now;
         task.IsCompleted = false;
         group.Tasks.Add(task);
+
         await _dbContext.SaveChangesAsync();
         return task.Id;
     }
@@ -78,8 +78,8 @@ public class TaskService : ITaskService
 
         if (!await BelongsToGroup(groupId)) throw new ForbidException("Insufficient permission");
 
-        var tasks = group.Tasks.Where(x => filter is null || x.IsCompleted.ToString().ToLower() == filter.ToLower());
-        if (tasks is null || tasks.Count() == 0) throw new NotFoundException("No tasks found");
+        var tasks = group.Tasks.Where(x => filter is null || string.Equals(x.IsCompleted.ToString(), filter, StringComparison.InvariantCultureIgnoreCase));
+        if (tasks is null || !tasks.Any()) throw new NotFoundException("No tasks found");
 
         var tasksDtos = _mapper.Map<List<TaskDto>>(tasks);
         return tasksDtos;

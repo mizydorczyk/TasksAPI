@@ -22,7 +22,7 @@ public class GroupService : IGroupService
         _dbContext = dbContext;
     }
 
-    public async Task<string> GetUniqueInvitationCode(int range = 10)
+    private async Task<string> GetUniqueInvitationCode(int range = 10)
     {
         var invitationCodes = await _dbContext
             .Groups
@@ -51,15 +51,19 @@ public class GroupService : IGroupService
         var group = await _dbContext
             .Groups
             .FirstOrDefaultAsync(x => x.Id == groupId);
-        if (group.CreatedById == userId) return true;
 
-        return false;
+        return group.CreatedById == userId;
     }
 
     public async Task<int> Create(CreateGroupDto dto)
     {
+        var createdById = _userContextService.GetUserId;
+        if (createdById == null)
+            throw new BadRequestException("Something went wrong");
+
         var group = _mapper.Map<Group>(dto);
-        group.CreatedById = (int)_userContextService.GetUserId;
+
+        group.CreatedById = (int)createdById;
         group.InvitationCode = await GetUniqueInvitationCode();
 
         var user = await _dbContext
@@ -103,7 +107,7 @@ public class GroupService : IGroupService
     public async System.Threading.Tasks.Task Join(string invitationCode)
     {
         var group = await _dbContext
-                        .Groups
+                        .Groups.Include(group => group.Users)
                         .FirstOrDefaultAsync(x => x.InvitationCode == invitationCode) ??
                     throw new BadRequestException("Invitation code is invalid or has already expired");
 
@@ -111,7 +115,10 @@ public class GroupService : IGroupService
         var user = await _dbContext
             .Users
             .FirstOrDefaultAsync(x => x.Id == userId);
+
         if (user is null) throw new NotFoundException("User does not exist");
+
+        if (group.Users.FirstOrDefault(x => x.Id == userId) != null) throw new BadRequestException("User already belongs to the group");
 
         group.Users.Add(user);
         user.Groups.Add(group);
@@ -123,6 +130,7 @@ public class GroupService : IGroupService
         var group = await _dbContext
             .Groups
             .FirstOrDefaultAsync(x => x.Id == groupId);
+
         if (group is null) throw new BadRequestException("Group does not exist");
 
         if (!await IsGroupOwner(groupId)) throw new ForbidException("Insufficient permission");
