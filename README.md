@@ -9,8 +9,8 @@ The app enables the registration and login of users, who can then create, mark a
 
 ## Technologies
 
-- [ASP.NET Core 6](https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core?view=aspnetcore-6.0)
-- [Entity Framework Core 6](https://learn.microsoft.com/en-us/ef/core/)
+- [ASP.NET Core 8](https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core?view=aspnetcore-8.0)
+- [Entity Framework Core 8](https://learn.microsoft.com/en-us/ef/core/)
 - [AutoMapper](https://automapper.org/)
 - [FluentValidation](https://docs.fluentvalidation.net/en/latest/)
 

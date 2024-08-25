@@ -1,8 +1,9 @@
 # Join
 User providing valid invitation code is able to join a group.  
-URL: `/api/group/join`  
+URL: `/api/group/join/?invitationCode=?`  
 Method: `GET`  
-Required Headers: `Authorization` with user's JWT and `Invitation Code` with invitation code  
+Required Headers: `Authorization` with user's JWT
+Params: `invitationCode` with invitation code  
 
 ## Success response
 Code: `200 OK`  
