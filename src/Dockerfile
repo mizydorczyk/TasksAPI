@@ -4,8 +4,8 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-COPY . .
 WORKDIR /src
+COPY . .
 RUN dotnet restore "tasks-api.csproj"
 RUN dotnet build "tasks-api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

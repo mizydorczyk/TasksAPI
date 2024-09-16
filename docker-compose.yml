@@ -1,8 +1,7 @@
 services:
   backend:
     image: tasks_api
-    build:
-      dockerfile: ./src/Dockerfile
+    build: ./src
     container_name: backend
     ports:
       - "5000:8080"
